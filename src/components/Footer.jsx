@@ -15,11 +15,6 @@ const Footer = () => (
         <p className="footer__description">
         A collaborative project crafted by Capstone Team CC25-CF146 at Coding Camp.
         </p>
-        <div className="footer__social">
-          <a href="https://facebook.com"     className="footer__social-link"><i className='bx bxl-facebook'></i></a>
-          <a href="https://instagram.com"    className="footer__social-link"><i className='bx bxl-instagram-alt'></i></a>
-          <a href="https://twitter.com"      className="footer__social-link"><i className='bx bxl-twitter'></i></a>
-        </div>
       </div>
 
       {/* Kolom 1: Pages */}
