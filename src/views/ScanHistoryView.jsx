@@ -113,7 +113,7 @@ export default function ScanHistoryView({ scanHistory = [], loading, error, sele
 
       // Pastikan data ini ada dan valid untuk dibagikan
       const predictedClass = scanDataToShareInModal.kondisi_jerawat || "Tidak diketahui";
-      const shareText = `Saya baru saja melakukan scan jerawat dan hasilnya: ${predictedClass}! Dapatkan analisis kulitmu di ${window.location.origin}/scan`;
+      const shareText = `Saya baru saja melakukan scan jerawat dan hasilnya: ${predictedClass}! Dapatkan analisis kulitmu di https://scan-jerawhat.vercel.app/`;
       const shareTitle = 'Hasil Scan Jerawatku!';
 
       await navigator.share({

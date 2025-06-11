@@ -252,7 +252,7 @@ export default function ScanView({
           const blob = await response.blob();
           const file = new File([blob], `hasil_scan_jerawat_${new Date().getTime()}.png`, { type: blob.type });
 
-          const shareText = `Saya baru saja melakukan scan jerawat dan hasilnya: ${predictionResult.predictedClass}! Dapatkan analisis kulitmu di ${window.location.origin}/scan`;
+          const shareText = `Saya baru saja melakukan scan jerawat dan hasilnya: ${predictionResult.predictedClass}! Dapatkan analisis kulitmu di https://scan-jerawhat.vercel.app/`;
           const shareTitle = 'Hasil Scan Jerawatku!';
 
           await navigator.share({
