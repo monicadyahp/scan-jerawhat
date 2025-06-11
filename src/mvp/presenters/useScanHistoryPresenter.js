@@ -341,7 +341,7 @@ export function useScanHistoryPresenter() {
 
 
       const promoText = "Yuk, cek kondisi kulitmu juga di:";
-      const appUrl = `${STATIC_APP_URL}/scan`;
+      const appUrl = `${STATIC_APP_URL}`;
       ctx.fillStyle = "#721c24";
       ctx.textAlign = "center";
       ctx.font = "bold 28px Arial";
