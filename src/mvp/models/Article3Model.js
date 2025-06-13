@@ -1,4 +1,3 @@
-// src/mvp/models/Article3Model.js
 
 export default class Article3Model {
   constructor() {

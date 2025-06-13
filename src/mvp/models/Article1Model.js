@@ -1,4 +1,3 @@
-// src/mvp/models/Article1Model.js
 export default class Article1Model {
   constructor() {
     this.tips = [

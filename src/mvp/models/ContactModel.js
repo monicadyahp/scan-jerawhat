@@ -1,4 +1,3 @@
-// bertugas membuat mailto‐link
 export default class ContactModel {
   constructor(serviceEmail) {
     this.serviceEmail = serviceEmail;

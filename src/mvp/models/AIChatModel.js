@@ -1,4 +1,3 @@
-// src/mvp/models/AIChatModel.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const GEMINI_API_KEY = "AIzaSyCxxeS6dm20h5IU4YqdkUE5AdAvOfI7M9E";
@@ -11,38 +10,25 @@ export default class AIChatModel {
         }
         this.genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
         this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        // this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-pro" }); // Jika ingin model lebih powerful
     }
 
     async sendMessage(messages) {
-        const lastUserMessage = messages[messages.length - 1]; // Pesan terakhir (dari user)
+        const lastUserMessage = messages[messages.length - 1]; 
 
-        // --- PENTING: Perbaikan di sini untuk membersihkan conversation history ---
-        // History untuk Gemini API harus selalu dimulai dengan 'user' dan bergantian 'user'/'model'.
-        // Kita akan membuat history baru yang memenuhi kriteria ini.
         let cleanedHistory = [];
         let previousRole = null;
 
-        for (let i = 0; i < messages.length - 1; i++) { // Iterasi semua pesan kecuali yang terakhir (pesan user saat ini)
+        for (let i = 0; i < messages.length - 1; i++) { 
             const msg = messages[i];
-
-            // Abaikan pesan 'system' atau pesan pembuka 'assistant' yang pertama
-            // Pesan pembuka 'assistant' di UI (`Halo! Ada yang bisa saya bantu hari ini?`) tidak boleh masuk history API
-            // karena API harus dimulai dengan 'user'.
             if (msg.role === "system" || (msg.role === "assistant" && i === 0)) {
                 continue;
             }
 
-            // Map role 'assistant' ke 'model' untuk Gemini API
             const currentRole = msg.role === "user" ? "user" : "model";
 
-            // Pastikan peran bergantian. Jika tidak, itu berarti ada masalah dalam urutan pesan UI
-            // atau ada pesan user/assistant berturut-turut.
             if (currentRole === previousRole) {
                 console.warn(`[Gemini Chat] Peringatan: Peran berturut-turut (${currentRole}). Riwayat mungkin tidak sesuai format Gemini.`);
-                // Untuk menghindari error API, Anda bisa memilih untuk mengabaikan pesan yang melanggar urutan
-                // atau coba gabungkan pesan dari peran yang sama (meskipun ini lebih kompleks).
-                // Untuk saat ini, kita biarkan dan Gemini API yang akan menolak jika formatnya salah.
+
             }
             
             cleanedHistory.push({
@@ -52,23 +38,20 @@ export default class AIChatModel {
             previousRole = currentRole;
         }
 
-        // --- Debugging logs ---
         console.log("Original Messages (from UI):", messages);
         console.log("Cleaned Conversation History (for Gemini API):", cleanedHistory);
         console.log("Last User Message (to send):", lastUserMessage.content);
-        // --- End Debugging logs ---
 
         try {
             const chat = this.model.startChat({
-                history: cleanedHistory, // Gunakan history yang sudah dibersihkan
+                history: cleanedHistory, 
                 generationConfig: {
                     maxOutputTokens: 1024,
                     temperature: 0.8,
                 },
-                // systemInstruction diterapkan secara global untuk chat, tidak sebagai bagian dari history
-                // (Ini adalah penggunaan yang benar untuk Gemini API)
+
                 systemInstruction: {
-                    role: "system", // Role harus 'system' di sini
+                    role: "system", 
                     parts: [{ text: "Jawab semua pertanyaan user dengan bahasa Indonesia yang sopan dan mudah dimengerti." }]
                 }
             });
@@ -90,7 +73,6 @@ export default class AIChatModel {
             if (error.response && error.response.candidates && error.response.candidates.length > 0 && error.response.candidates[0].finishReason === 'SAFETY') {
                 return "Maaf, respons AI diblokir karena alasan keamanan.";
             }
-            // Tangkap error "First content should be with role 'user', got model"
             if (error.message.includes("First content should be with role 'user', got model") || error.message.includes("history must start with a user role")) {
                 return "Terjadi masalah dengan riwayat percakapan. Coba mulai chat baru (pastikan riwayat dimulai dengan pertanyaan Anda).";
             }

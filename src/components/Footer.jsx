@@ -1,4 +1,3 @@
-// src/components/Footer.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -6,7 +5,6 @@ const Footer = () => (
   <footer className="footer section">
     <div className="footer__container container grid">
 
-      {/* Logo & sosial */}
       <div className="footer__content">
         <Link to="/" className="footer__logo">
           <img src="https://res.cloudinary.com/dbofowabd/image/upload/v1748105265/logo_qcvmzx.png" alt="logo" className="footer__logo-img" />
@@ -17,7 +15,6 @@ const Footer = () => (
         </p>
       </div>
 
-      {/* Kolom 1: Pages */}
       <div className="footer__content">
         <h3 className="footer__title">Pages</h3>
         <ul className="footer__links">
@@ -27,17 +24,14 @@ const Footer = () => (
         </ul>
       </div>
 
-      {/* Kolom 2: Tentang Kami */}
       <div className="footer__content">
         <h3 className="footer__title">About Us</h3>
         <ul className="footer__links">
           <li><Link to="/about-team" className="footer__link">Team Profile</Link></li>
           <li><Link to="/our-mission" className="footer__link">Our Mission</Link></li>
-          {/* Buat juga halaman /our-mission jika diperlukan */}
         </ul>
       </div>
 
-      {/* Kolom 3: Lain‐lain atau Help */}
       <div className="footer__content">
         <h3 className="footer__title">Support</h3>
         <ul className="footer__links">

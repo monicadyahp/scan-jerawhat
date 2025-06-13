@@ -1,4 +1,3 @@
-// bertugas menyimpan semua data statis untuk Home
 export default class HomeModel {
   constructor() {
     this.slides = [
