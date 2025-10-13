@@ -1,7 +1,8 @@
+// AIChatModel.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const GEMINI_API_KEY = "AIzaSyDgui3ua-qTSGNynr0RPD_36ZJqwqRlUkw";
-
+// Akses dari variabel lingkungan (JANGAN HARDCODE KUNCI DI SINI)
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 
 export default class AIChatModel {
     constructor() {
         if (!GEMINI_API_KEY || GEMINI_API_KEY.length < 30) {
