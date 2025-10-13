@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const GEMINI_API_KEY = "AIzaSyCxxeS6dm20h5IU4YqdkUE5AdAvOfI7M9E";
+const GEMINI_API_KEY = "AIzaSyDgui3ua-qTSGNynr0RPD_36ZJqwqRlUkw";
 
 export default class AIChatModel {
     constructor() {
