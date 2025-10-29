@@ -1,3 +1,4 @@
+// src/mvp/models/ArticleModel.js
 export default class ArticleModel {
   constructor() {
     this.intro = {

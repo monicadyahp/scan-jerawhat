@@ -1,8 +1,9 @@
+// src/components/Header.jsx
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
-import notificationService from '../utils/notification'; 
+import notificationService from '../utils/notification'; // Path relatif yang sudah kita betulkan
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -89,7 +90,9 @@ const Header = () => {
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
-
+          // window.location.reload(); // Atau ini untuk full reload jika diperlukan
+          // Jika Anda ingin routing tanpa full reload:
+          // navigate('/login'); // Pastikan Anda mengimpor useNavigate dari react-router-dom jika pakai ini
         });
       }
     });
@@ -192,6 +195,7 @@ const Header = () => {
           <img src="https://res.cloudinary.com/dbofowabd/image/upload/v1748105258/detailjerawat1_h4lojo.png" alt="" className="nav__img" />
         </div>
 
+        {/* Kosongkan nav__btns karena tombol login/logout akan di dalam menu atau dihilangkan */}
 
       </nav>
     </header>

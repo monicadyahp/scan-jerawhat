@@ -1,3 +1,4 @@
+// src/mvp/models/AboutScanModel.js
 export default class AboutScanModel {
   constructor() {
     this.blocks = [

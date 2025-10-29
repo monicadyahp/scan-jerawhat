@@ -1,3 +1,4 @@
+// src/mvp/models/AboutTeamModel.js
 
 export default class AboutTeamModel {
   getTeamMembers() {
