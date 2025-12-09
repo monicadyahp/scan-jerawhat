@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
-import notificationService from '../utils/notification';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,26 +14,6 @@ const Header = () => {
 
   const toggleMenu = () => setMenuOpen(prev => !prev);
   const closeMenu = () => setMenuOpen(false);
-
-  const [isPushEnabled, setIsPushEnabled] = useState(false);
-  const [pushLoading, setPushLoading] = useState(true);
-
-  // Cek status Push Notification
-  useEffect(() => {
-    async function checkPushStatus() {
-      if ('serviceWorker' in navigator && 'PushManager' in window) {
-        try {
-          const swRegistration = await navigator.serviceWorker.ready;
-          const subscription = await swRegistration.pushManager.getSubscription();
-          setIsPushEnabled(!!subscription);
-        } catch (error) {
-          console.error("Failed to check push subscription status:", error);
-        }
-      }
-      setPushLoading(false);
-    }
-    checkPushStatus();
-  }, [user]);
 
   // Efek Scroll Header
   useEffect(() => {
@@ -68,10 +47,6 @@ const Header = () => {
         Swal.fire({
           icon: 'success',
           title: 'Berhasil Keluar!',
-          text: 'Anda telah berhasil keluar dari akun.',
-          background: '#fbeaea',
-          confirmButtonColor: 'hsl(330, 91%, 85%)',
-          color: 'hsl(323, 70%, 30%)',
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
@@ -81,8 +56,6 @@ const Header = () => {
     });
   };
 
-  // Logic untuk menandai menu aktif
-  // Scan dianggap aktif jika URL-nya persis "/scan"
   const isScanActive = location.pathname === "/scan"; 
   const isArticleDetail = location.pathname.startsWith("/article-");
 
@@ -101,18 +74,18 @@ const Header = () => {
         <div className={`nav__menu ${menuOpen ? 'show-menu' : ''}`} id="nav-menu">
           <ul className="nav__list">
             
-            {/* 1. HOME */}
+            {/* --- BAGIAN 1: MENU GLOBAL (MUNCUL UNTUK SEMUA ORANG) --- */}
+            {/* Pastikan Scan Wajah ada di bagian ini, DI LUAR kurung { } user logic */}
+
             <li className="nav__item">
               <NavLink to="/" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Home</NavLink>
             </li>
             
-            {/* 2. ABOUT */}
             <li className="nav__item">
               <NavLink to="/about-scan" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>About</NavLink>
             </li>
 
-            {/* 3. SCAN WAJAH (PERUBAHAN UTAMA DI SINI) */}
-            {/* Diubah dari "/scanlanding" menjadi "/scan" agar langsung ke kamera */}
+            {/* INI MENU SCAN WAJAH - SUDAH BENAR DI SINI */}
             <li className="nav__item">
               <NavLink 
                 to="/scan" 
@@ -123,12 +96,12 @@ const Header = () => {
               </NavLink>
             </li>
 
-            {/* 4. ARTICLE */}
             <li className="nav__item">
               <NavLink to="/article" className={({ isActive }) => 'nav__link' + ((isActive || isArticleDetail) ? ' active-link' : '')} onClick={closeMenu}>Article</NavLink>
             </li>
 
-            {/* --- MENU JIKA SUDAH LOGIN --- */}
+
+            {/* --- BAGIAN 2: MENU KHUSUS USER LOGIN --- */}
             {!loading && isLoggedIn && (
               <>
                 <li className="nav__item nav__dropdown">
@@ -139,11 +112,7 @@ const Header = () => {
                   </span>
                   <ul className="nav__dropdown-menu">
                     <li>
-                      <NavLink
-                        to="/scan/history"
-                        className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')}
-                        onClick={closeMenu}
-                      >
+                      <NavLink to="/scan/history" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>
                         Riwayat Scan
                       </NavLink>
                     </li>
@@ -174,12 +143,13 @@ const Header = () => {
               </>
             )}
 
-            {/* --- MENU JIKA BELUM LOGIN --- */}
+            {/* --- BAGIAN 3: MENU JIKA BELUM LOGIN (GUEST) --- */}
             {!loading && !isLoggedIn && (
                 <li className="nav__item">
                   <NavLink to="/login" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Login</NavLink>
                 </li>
             )}
+
           </ul>
 
           <div className="nav__close" id="nav-close" onClick={closeMenu}>
