@@ -47,6 +47,10 @@ const Header = () => {
         Swal.fire({
           icon: 'success',
           title: 'Berhasil Keluar!',
+          text: 'Anda telah berhasil keluar dari akun.',
+          background: '#fbeaea',
+          confirmButtonColor: 'hsl(330, 91%, 85%)',
+          color: 'hsl(323, 70%, 30%)',
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
@@ -74,9 +78,11 @@ const Header = () => {
         <div className={`nav__menu ${menuOpen ? 'show-menu' : ''}`} id="nav-menu">
           <ul className="nav__list">
             
-            {/* --- BAGIAN 1: MENU GLOBAL (MUNCUL UNTUK SEMUA ORANG) --- */}
-            {/* Pastikan Scan Wajah ada di bagian ini, DI LUAR kurung { } user logic */}
-
+            {/* ======================================================= */}
+            {/* BAGIAN 1: MENU PUBLIK (MUNCUL UNTUK SIAPA SAJA)        */}
+            {/* Pastikan menu ini TIDAK diapit oleh kurung kurawal {}   */}
+            {/* ======================================================= */}
+            
             <li className="nav__item">
               <NavLink to="/" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Home</NavLink>
             </li>
@@ -85,7 +91,7 @@ const Header = () => {
               <NavLink to="/about-scan" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>About</NavLink>
             </li>
 
-            {/* INI MENU SCAN WAJAH - SUDAH BENAR DI SINI */}
+            {/* Menu SCAN WAJAH (Wajib muncul untuk Guest & User) */}
             <li className="nav__item">
               <NavLink 
                 to="/scan" 
@@ -101,7 +107,11 @@ const Header = () => {
             </li>
 
 
-            {/* --- BAGIAN 2: MENU KHUSUS USER LOGIN --- */}
+            {/* ======================================================= */}
+            {/* BAGIAN 2: LOGIKA LOGIN vs BELUM LOGIN                   */}
+            {/* ======================================================= */}
+
+            {/* Jika User SUDAH Login */}
             {!loading && isLoggedIn && (
               <>
                 <li className="nav__item nav__dropdown">
@@ -112,7 +122,11 @@ const Header = () => {
                   </span>
                   <ul className="nav__dropdown-menu">
                     <li>
-                      <NavLink to="/scan/history" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>
+                      <NavLink
+                        to="/scan/history"
+                        className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')}
+                        onClick={closeMenu}
+                      >
                         Riwayat Scan
                       </NavLink>
                     </li>
@@ -143,7 +157,7 @@ const Header = () => {
               </>
             )}
 
-            {/* --- BAGIAN 3: MENU JIKA BELUM LOGIN (GUEST) --- */}
+            {/* Jika User BELUM Login */}
             {!loading && !isLoggedIn && (
                 <li className="nav__item">
                   <NavLink to="/login" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Login</NavLink>
