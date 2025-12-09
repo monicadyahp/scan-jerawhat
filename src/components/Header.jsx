@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
-import notificationService from '../utils/notification'; 
+import notificationService from '../utils/notification';
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { user, loading, logout } = useAuth(); // Ambil logout dari sini
+  const { user, loading, logout } = useAuth();
   const isLoggedIn = !!user;
 
   const toggleMenu = () => setMenuOpen(prev => !prev);
@@ -19,6 +19,7 @@ const Header = () => {
   const [isPushEnabled, setIsPushEnabled] = useState(false);
   const [pushLoading, setPushLoading] = useState(true);
 
+  // Cek status Push Notification
   useEffect(() => {
     async function checkPushStatus() {
       if ('serviceWorker' in navigator && 'PushManager' in window) {
@@ -35,25 +36,7 @@ const Header = () => {
     checkPushStatus();
   }, [user]);
 
-  const handlePushToggle = async () => {
-    setPushLoading(true);
-    try {
-      if (isPushEnabled) {
-        await notificationService.unregisterPush();
-        Swal.fire('Berhasil!', 'Push notification dinonaktifkan.', 'success');
-      } else {
-        await notificationService.registerPush();
-        Swal.fire('Berhasil!', 'Push notification diaktifkan.', 'success');
-      }
-      setIsPushEnabled(!isPushEnabled);
-    } catch (error) {
-      Swal.fire('Gagal!', `Terjadi kesalahan: ${error.message}`, 'error');
-      console.error('Push toggle error:', error);
-    } finally {
-      setPushLoading(false);
-    }
-  };
-
+  // Efek Scroll Header
   useEffect(() => {
     const handleScroll = () => {
       const header = document.getElementById('header');
@@ -65,6 +48,7 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Fungsi Logout
   const handleLogout = () => {
     Swal.fire({
       title: 'Yakin ingin keluar?',
@@ -91,13 +75,15 @@ const Header = () => {
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
-           navigate('/'); // Redirect ke home atau login page
+           navigate('/'); 
         });
       }
     });
   };
 
-  const isScanActive = location.pathname === "/scan";
+  // Logic untuk menandai menu aktif
+  // Scan dianggap aktif jika URL-nya persis "/scan"
+  const isScanActive = location.pathname === "/scan"; 
   const isArticleDetail = location.pathname.startsWith("/article-");
 
   return (
@@ -107,7 +93,7 @@ const Header = () => {
           JeraWHAT?!
         </Link>
 
-        {/* Tombol Hamburger (Menu Toggle) untuk Mobile */}
+        {/* Tombol Hamburger */}
         <div className="nav__toggle" id="nav-toggle" onClick={toggleMenu}>
           <i className="bx bx-grid-alt"></i>
         </div>
@@ -115,16 +101,18 @@ const Header = () => {
         <div className={`nav__menu ${menuOpen ? 'show-menu' : ''}`} id="nav-menu">
           <ul className="nav__list">
             
-            {/* --- MENU GLOBAL (Bisa diakses tanpa login) --- */}
+            {/* 1. HOME */}
             <li className="nav__item">
               <NavLink to="/" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Home</NavLink>
             </li>
             
+            {/* 2. ABOUT */}
             <li className="nav__item">
               <NavLink to="/about-scan" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>About</NavLink>
             </li>
 
-            {/* Menu SCAN dipindahkan ke sini agar bisa diakses tanpa login */}
+            {/* 3. SCAN WAJAH (PERUBAHAN UTAMA DI SINI) */}
+            {/* Diubah dari "/scanlanding" menjadi "/scan" agar langsung ke kamera */}
             <li className="nav__item">
               <NavLink 
                 to="/scan" 
@@ -135,11 +123,12 @@ const Header = () => {
               </NavLink>
             </li>
 
+            {/* 4. ARTICLE */}
             <li className="nav__item">
               <NavLink to="/article" className={({ isActive }) => 'nav__link' + ((isActive || isArticleDetail) ? ' active-link' : '')} onClick={closeMenu}>Article</NavLink>
             </li>
 
-            {/* --- MENU KHUSUS LOGIN --- */}
+            {/* --- MENU JIKA SUDAH LOGIN --- */}
             {!loading && isLoggedIn && (
               <>
                 <li className="nav__item nav__dropdown">
@@ -177,7 +166,6 @@ const Header = () => {
                   <NavLink to="/profile" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Profile</NavLink>
                 </li>
 
-                {/* Tombol Logout di menu mobile */}
                 <li className="nav__item">
                     <span className="nav__link" style={{ cursor: 'pointer', color: 'crimson' }} onClick={() => { closeMenu(); handleLogout(); }}>
                         Logout
