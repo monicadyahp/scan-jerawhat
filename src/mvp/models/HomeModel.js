@@ -12,7 +12,7 @@ export default class HomeModel {
           'Apakah kamu merasa sedih karena jerawat yang muncul? ' +
           'Kami punya solusi untuk merawat dan mengatasi masalah kulitmu.',
         btnText: 'Cek Sekarang',
-        btnLink: '/scanlanding'
+        btnLink: '/scan'
       },
       {
         groupImg: 'https://res.cloudinary.com/dbofowabd/image/upload/v1748105261/home2-img_qdmyud.png',
@@ -25,7 +25,7 @@ export default class HomeModel {
           'kondisi kulit serta jerawat yang ada. Teknologi canggih untuk ' +
           'perawatan kulit yang lebih baik.',
         btnText: 'Cek Sekarang',
-        btnLink: '/scanlanding'
+        btnLink: '/scan'
       },
       {
         groupImg: 'https://res.cloudinary.com/dbofowabd/image/upload/v1748105264/home3-img_qkykrh.png',
@@ -37,7 +37,7 @@ export default class HomeModel {
           'Kami memberikan rekomendasi makanan dan gaya hidup sehat yang dapat membantu ' +
           'mengurangi jerawat dan menjaga kulit tetap bersih dan cerah.',
         btnText: 'Cek Sekarang',
-        btnLink: '/scanlanding'
+        btnLink: '/scan'
       }
     ];
   }
