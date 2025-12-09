@@ -1,15 +1,16 @@
 // src/components/Header.jsx
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
-import notificationService from '../utils/notification'; // Path relatif yang sudah kita betulkan
+import notificationService from '../utils/notification'; 
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth(); // Ambil logout dari sini
   const isLoggedIn = !!user;
 
   const toggleMenu = () => setMenuOpen(prev => !prev);
@@ -90,16 +91,13 @@ const Header = () => {
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
-          // window.location.reload(); // Atau ini untuk full reload jika diperlukan
-          // Jika Anda ingin routing tanpa full reload:
-          // navigate('/login'); // Pastikan Anda mengimpor useNavigate dari react-router-dom jika pakai ini
+           navigate('/'); // Redirect ke home atau login page
         });
       }
     });
   };
 
-  const scanPaths = ["/scanlanding", "/login", "/register", "/scan"];
-  const isScanActive = scanPaths.includes(location.pathname);
+  const isScanActive = location.pathname === "/scan";
   const isArticleDetail = location.pathname.startsWith("/article-");
 
   return (
@@ -116,50 +114,41 @@ const Header = () => {
 
         <div className={`nav__menu ${menuOpen ? 'show-menu' : ''}`} id="nav-menu">
           <ul className="nav__list">
-            {/* Menus for NOT LOGGED IN users */}
-            {!loading && !isLoggedIn && (
-              <>
-                <li className="nav__item">
-                  <NavLink to="/" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Home</NavLink>
-                </li>
-                <li className="nav__item">
-                  <NavLink to="/about-scan" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>About</NavLink>
-                </li>
-                <li className="nav__item">
-                  <NavLink to="/article" className={({ isActive }) => 'nav__link' + ((isActive || isArticleDetail) ? ' active-link' : '')} onClick={closeMenu}>Article</NavLink>
-                </li>
-                <li className="nav__item">
-                  <NavLink
-                    to="/scanlanding"
-                    className={({ isActive }) => 'nav__link' + ((isActive || isScanActive) ? ' active-link' : '')}
-                    onClick={closeMenu}
-                  >
-                    Scan
-                  </NavLink>
-                </li>
-              </>
-            )}
+            
+            {/* --- MENU GLOBAL (Bisa diakses tanpa login) --- */}
+            <li className="nav__item">
+              <NavLink to="/" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Home</NavLink>
+            </li>
+            
+            <li className="nav__item">
+              <NavLink to="/about-scan" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>About</NavLink>
+            </li>
 
-            {/* Menus for LOGGED IN users */}
+            {/* Menu SCAN dipindahkan ke sini agar bisa diakses tanpa login */}
+            <li className="nav__item">
+              <NavLink 
+                to="/scan" 
+                className={({ isActive }) => 'nav__link' + ((isActive || isScanActive) ? ' active-link' : '')}
+                onClick={closeMenu}
+              >
+                Scan Wajah
+              </NavLink>
+            </li>
+
+            <li className="nav__item">
+              <NavLink to="/article" className={({ isActive }) => 'nav__link' + ((isActive || isArticleDetail) ? ' active-link' : '')} onClick={closeMenu}>Article</NavLink>
+            </li>
+
+            {/* --- MENU KHUSUS LOGIN --- */}
             {!loading && isLoggedIn && (
               <>
-
                 <li className="nav__item nav__dropdown">
                   <span className={
-                    'nav__link' + (isScanActive || location.pathname.startsWith('/scan/history') ? ' active-link' : '')
+                    'nav__link' + (location.pathname.startsWith('/scan/history') ? ' active-link' : '')
                   }>
-                    Scan <i className="bx bx-chevron-down"></i>
+                    Fitur Lain <i className="bx bx-chevron-down"></i>
                   </span>
                   <ul className="nav__dropdown-menu">
-                    <li>
-                      <NavLink
-                        to="/scan"
-                        className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')}
-                        onClick={closeMenu}
-                      >
-                        Mulai Scan
-                      </NavLink>
-                    </li>
                     <li>
                       <NavLink
                         to="/scan/history"
@@ -169,34 +158,47 @@ const Header = () => {
                         Riwayat Scan
                       </NavLink>
                     </li>
+                    <li>
+                        <NavLink to="/quiz" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Kuis</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/rekomendasi" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Rekomendasi</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/maps" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Maps</NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/ai-chat" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>AI Chat</NavLink>
+                    </li>
                   </ul>
                 </li>
-                <li className="nav__item">
-                  <NavLink to="/quiz" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Kuis</NavLink>
-                </li>
-                <li className="nav__item">
-                  <NavLink to="/rekomendasi" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Rekomendasi</NavLink>
-                </li>
-                <li className="nav__item">
-                  <NavLink to="/maps" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Maps</NavLink>
-                </li>
-                <li className="nav__item">
-                  <NavLink to="/ai-chat" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>AI Chat</NavLink>
-                </li>
+                
                 <li className="nav__item">
                   <NavLink to="/profile" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Profile</NavLink>
                 </li>
+
+                {/* Tombol Logout di menu mobile */}
+                <li className="nav__item">
+                    <span className="nav__link" style={{ cursor: 'pointer', color: 'crimson' }} onClick={() => { closeMenu(); handleLogout(); }}>
+                        Logout
+                    </span>
+                </li>
               </>
             )}
+
+            {/* --- MENU JIKA BELUM LOGIN --- */}
+            {!loading && !isLoggedIn && (
+                <li className="nav__item">
+                  <NavLink to="/login" className={({ isActive }) => 'nav__link' + (isActive ? ' active-link' : '')} onClick={closeMenu}>Login</NavLink>
+                </li>
+            )}
           </ul>
+
           <div className="nav__close" id="nav-close" onClick={closeMenu}>
             <i className="bx bx-x"></i>
           </div>
           <img src="https://res.cloudinary.com/dbofowabd/image/upload/v1748105258/detailjerawat1_h4lojo.png" alt="" className="nav__img" />
         </div>
-
-        {/* Kosongkan nav__btns karena tombol login/logout akan di dalam menu atau dihilangkan */}
-
       </nav>
     </header>
   );

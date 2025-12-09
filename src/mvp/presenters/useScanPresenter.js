@@ -26,7 +26,6 @@ export default function useScanPresenter() {
   const scanIntervalRef = useRef(null);
 
   const [lifestyleRecommendations, setLifestyleRecommendations] = useState(null);
-// test 
   const STATIC_APP_URL = 'https://jerawhat-capstone.vercel.app/';
 
   useEffect(() => {
@@ -150,9 +149,9 @@ export default function useScanPresenter() {
     if (!videoRef.current || loading || modelLoadStatus !== "ready" || faceDetectionStatus.status !== "idle") return;
     setIsCapturing(true);
     setLoading(true);
-    setStatusMsg("Menganalisis gambar..."); // Atur pesan loading duluan
+    setStatusMsg("Menganalisis gambar...");
     setPredictionResult(null);
-    setFaceDetectionStatus({ status: "detecting", error: null }); // Mulai status detecting
+    setFaceDetectionStatus({ status: "detecting", error: null });
 
     try {
       const video = videoRef.current;
@@ -170,17 +169,13 @@ export default function useScanPresenter() {
 
       stopCamera();
 
-      // Panggil onSubmit untuk memproses gambar yang baru diambil
-      // Kita perlu membuat sebuah "mock event" atau memanggil logikanya secara langsung
-      // agar tidak ada kebergantungan siklus pada onSubmit
-      await processImageForPrediction(file); // Panggil fungsi pembantu ini
+      await processImageForPrediction(file);
     } catch (error) {
       console.error("Error taking snapshot:", error);
       setStatusMsg("Gagal mengambil gambar: " + error.message);
-      setLoading(false); // Pastikan loading direset jika ada error
+      setLoading(false);
     } finally {
       setIsCapturing(false);
-      // setLoading(false); // Di sini mungkin terlalu cepat, biarkan processImageForPrediction yang reset
     }
   };
 
@@ -202,7 +197,7 @@ export default function useScanPresenter() {
 
       setSelectedImage(null);
       setPredictionResult(null);
-      setStatusMsg(""); // Reset statusMsg saat memulai kamera
+      setStatusMsg("");
       setFaceDetectionStatus({ status: "idle", error: null });
       setImagePreview(null);
     } catch (error) {
@@ -230,22 +225,29 @@ export default function useScanPresenter() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // --- FUNGSI SAVE HISTORY YANG SUDAH DIMODIFIKASI UNTUK GUEST MODE ---
   const saveHistoryToBackend = async (dataToSave) => {
     try {
       const userDataString = localStorage.getItem("user");
+      
+      // Jika tidak ada user (Guest), jangan simpan, jangan error, langsung return.
       if (!userDataString) {
-        throw new Error("Data user tidak ditemukan di penyimpanan lokal. Anda harus login.");
+        console.log("Guest mode: Hasil prediksi ditampilkan tanpa menyimpan riwayat.");
+        return;
       }
+
       let userData;
       try {
         userData = JSON.parse(userDataString);
       } catch (e) {
-        throw new Error("Data user di penyimpanan lokal rusak. Silakan login ulang.");
+        console.warn("Data user lokal rusak, skip penyimpanan riwayat.");
+        return; 
       }
 
       const token = userData.token;
       if (!token) {
-        throw new Error("Token autentikasi tidak ditemukan dalam data user. Anda harus login.");
+        console.log("Token tidak ditemukan, skip penyimpanan riwayat.");
+        return;
       }
 
       const formData = new FormData();
@@ -267,24 +269,19 @@ export default function useScanPresenter() {
       const result = await response.json();
 
       if (!response.ok) {
-        console.error("Backend error response:", result);
-        let errorMessage = result.message || "Gagal menyimpan riwayat.";
-        if (response.status === 401) {
-          errorMessage = result.message || "Sesi login Anda telah berakhir. Silakan login ulang.";
-        }
-        throw new Error(errorMessage);
+        console.warn("Backend response not OK:", result);
+        // Kita tidak throw error di sini agar user tetap bisa melihat hasil scan
+      } else {
+        console.log("Riwayat berhasil disimpan:", result);
       }
-
-      console.log("Riwayat berhasil disimpan:", result);
     } catch (error) {
-      console.error("Error saving history to backend:", error);
-      setStatusMsg("Gagal menyimpan riwayat: " + error.message);
+      console.error("Error saving history to backend (Guest mode handled):", error);
+      // Jangan setStatusMsg error di sini agar flow UI tidak terganggu
     }
   };
+  // ---------------------------------------------------------------------
 
-  // Fungsi pembantu untuk memproses gambar
   const processImageForPrediction = async (imageFileToProcess) => {
-    // Pastikan ini dimulai dengan loading state
     setLoading(true);
     setStatusMsg("Menganalisis gambar...");
     setPredictionResult(null);
@@ -294,13 +291,13 @@ export default function useScanPresenter() {
       const faceDetectionRes = await model.detectFace(imageFileToProcess);
       if (!faceDetectionRes.success) {
         setFaceDetectionStatus({ status: "error", error: faceDetectionRes.message });
-        setStatusMsg(faceDetectionRes.message); // Set pesan error deteksi wajah
-        return; // Hentikan alur jika deteksi wajah gagal
+        setStatusMsg(faceDetectionRes.message);
+        return;
       }
       if (faceDetectionRes.data.predictedClass === "non wajah") {
         setFaceDetectionStatus({ status: "no_face", error: null });
-        setStatusMsg("Tidak ada wajah terdeteksi dalam gambar."); // Set pesan tidak ada wajah
-        return; // Hentikan alur jika tidak ada wajah
+        setStatusMsg("Tidak ada wajah terdeteksi dalam gambar.");
+        return;
       }
       setFaceDetectionStatus({ status: "detected", error: null });
 
@@ -330,11 +327,10 @@ export default function useScanPresenter() {
               rekomendasi_aktivitas_fisik: recommendations.aktivitas_fisik.join("; "),
               rekomendasi_manajemen_stress: recommendations.manajemen_stres.join("; "),
             };
-            try {
-              await saveHistoryToBackend(dataToSave);
-            } catch (historyError) {
-              console.error("Error saving history after prediction:", historyError);
-            }
+            
+            // Panggil fungsi save yang aman untuk guest
+            await saveHistoryToBackend(dataToSave);
+            
           } else {
             console.warn("Tidak ada rekomendasi yang cocok untuk kelas prediksi:", result.data.predictedClass);
           }
@@ -346,16 +342,15 @@ export default function useScanPresenter() {
       console.error("Error during full prediction process:", error);
       setStatusMsg("Gagal melakukan analisis: " + error.message);
     } finally {
-      setLoading(false); // Pastikan loading direset setelah semua proses selesai
+      setLoading(false);
     }
   };
-
 
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!selectedImage || loading || modelLoadStatus !== "ready" || faceDetectionStatus.status === "detecting") return;
 
-    await processImageForPrediction(selectedImage); // Panggil fungsi pembantu ini
+    await processImageForPrediction(selectedImage);
   };
 
   const onFileChange = (e) => {
@@ -423,7 +418,6 @@ export default function useScanPresenter() {
       let imgXAligned = startXContent;
       let imgYAligned = startYContentBlock + ((3 * detailTextLineHeight * 2) - smallImageSize) / 2 - 20;
 
-
       ctx.save();
       ctx.beginPath();
       ctx.arc(imgXAligned + smallImageSize / 2, imgYAligned + smallImageSize / 2, smallImageSize / 2, 0, Math.PI * 2, false);
@@ -466,7 +460,6 @@ export default function useScanPresenter() {
       ctx.font = "20px Arial";
       ctx.fillText(`${(predictionResult.confidence * 100).toFixed(2)}%`, textXDetail, currentYDetail + detailTextLineHeight);
       currentYDetail += detailTextLineHeight * 2;
-
 
       let currentYRekomendasi = currentYDetail + margin;
 
@@ -531,14 +524,13 @@ export default function useScanPresenter() {
 
       const promoText = "Yuk, cek kondisi kulitmu juga di:";
       const appUrl = 'https://scan-jerawhat.vercel.app';
-      // const appUrl = `${STATIC_APP_URL}`;
+      
       ctx.fillStyle = "#721c24";
       ctx.textAlign = "center";
       ctx.font = "bold 28px Arial";
       ctx.fillText(promoText, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 80);
       ctx.font = "28px Arial";
       ctx.fillText(appUrl, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 40);
-
 
       return canvas.toDataURL('image/png');
     } catch (error) {
